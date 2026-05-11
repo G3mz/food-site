@@ -1,10 +1,20 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { X, ShoppingCart, UtensilsCrossed, Plus, Minus, Trash2, Clock, Users, Flame, Weight, Heart, Leaf, ChefHat } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
+const WEIGHT_OPTIONS = [
+  { key: '500', label: '500 г' },
+  { key: '1000', label: '1 кг' },
+];
+
 export default function ProductModal({ product, onClose, products = [] }) {
   const { addToCart, items, changeQty } = useCart();
-  const qty = items[product.name]?.qty || 0;
+  const [weight, setWeight] = useState('500');
+
+  const priceKg = product?.price_kg ?? (product ? product.price * 2 : 0);
+  const currentPrice = weight === '500' ? product?.price : priceKg;
+  const variantName = product ? `${product.name}, ${weight === '500' ? '500 г' : '1 кг'}` : '';
+  const qty = items[variantName]?.qty || 0;
 
   useEffect(() => {
     const handleEsc = (e) => { if (e.key === 'Escape') onClose(); };
@@ -40,6 +50,24 @@ export default function ProductModal({ product, onClose, products = [] }) {
         className="bg-white sm:rounded-2xl w-full sm:max-w-[520px] h-full sm:h-auto sm:max-h-[90vh] overflow-y-auto modal-scroll animate-slide-up relative"
         onClick={e => e.stopPropagation()}
       >
+        {/* Floating close button — sticks to top-right while scrolling */}
+        <div className="sticky top-0 z-10 h-0">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center text-gray-800 hover:text-black transition-all"
+            style={{
+              background: 'rgba(255,255,255,0.55)',
+              backdropFilter: 'blur(20px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+              border: '1px solid rgba(255,255,255,0.6)',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.12), inset 0 1px 1px rgba(255,255,255,0.6)',
+            }}
+            aria-label="Закрыть"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
         {/* Image — edge to edge */}
         <div className="relative w-full aspect-[4/3] bg-gray-100">
           {hasImage ? (
@@ -56,20 +84,6 @@ export default function ProductModal({ product, onClose, products = [] }) {
             </div>
           )}
 
-          {/* Liquid Glass Close Button */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center text-white/90 hover:text-white transition-all"
-            style={{
-              background: 'rgba(255,255,255,0.18)',
-              backdropFilter: 'blur(20px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-              border: '1px solid rgba(255,255,255,0.3)',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.1), inset 0 1px 1px rgba(255,255,255,0.4)',
-            }}
-          >
-            <X className="w-5 h-5" />
-          </button>
         </div>
 
         {/* Body */}
@@ -143,14 +157,46 @@ export default function ProductModal({ product, onClose, products = [] }) {
             </div>
           )}
 
-          {/* Price + Cart */}
-          <div className="flex items-center justify-between py-5 border-t border-b border-gray-100 mb-5">
+          {/* Weight switcher */}
+          <div className="mb-4">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Выберите вес</p>
+            <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-xl">
+              {WEIGHT_OPTIONS.map(opt => {
+                const optPrice = opt.key === '500' ? product.price : priceKg;
+                const active = weight === opt.key;
+                return (
+                  <button
+                    key={opt.key}
+                    onClick={() => setWeight(opt.key)}
+                    className={`flex flex-col items-center justify-center py-2.5 rounded-lg transition-all ${
+                      active
+                        ? 'bg-white shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    <span className={`text-sm font-bold ${active ? 'text-gray-900' : ''}`}>{opt.label}</span>
+                    <span className={`text-xs ${active ? 'text-navy font-semibold' : 'text-gray-400'}`}>{optPrice} ₽</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Price + Cart — sticky at bottom */}
+          <div
+            className="sticky bottom-0 -mx-5 sm:-mx-6 px-5 sm:px-6 flex items-center justify-between py-4 border-t border-gray-100 mb-5 z-10"
+            style={{
+              background: 'rgba(255,255,255,0.92)',
+              backdropFilter: 'blur(16px) saturate(160%)',
+              WebkitBackdropFilter: 'blur(16px) saturate(160%)',
+            }}
+          >
             <span className="text-2xl font-bold text-gray-900">
-              {product.price} <span className="text-base text-gray-500">₽</span>
+              {currentPrice} <span className="text-base text-gray-500">₽</span>
             </span>
             {qty === 0 ? (
               <button
-                onClick={() => addToCart(product.name, product.price)}
+                onClick={() => addToCart(variantName, currentPrice)}
                 className="btn-navy text-sm"
               >
                 <ShoppingCart className="w-4 h-4" />
@@ -159,14 +205,14 @@ export default function ProductModal({ product, onClose, products = [] }) {
             ) : (
               <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-1.5 py-1.5">
                 <button
-                  onClick={() => changeQty(product.name, -1)}
+                  onClick={() => changeQty(variantName, -1)}
                   className="w-9 h-9 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:border-navy hover:text-navy transition-colors"
                 >
                   {qty === 1 ? <Trash2 className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
                 </button>
                 <span className="text-base font-bold text-gray-900 min-w-[24px] text-center">{qty}</span>
                 <button
-                  onClick={() => addToCart(product.name, product.price)}
+                  onClick={() => addToCart(variantName, currentPrice)}
                   className="w-9 h-9 rounded-lg bg-navy text-white flex items-center justify-center hover:bg-navy-light transition-colors"
                 >
                   <Plus className="w-4 h-4" />

@@ -1,8 +1,8 @@
 import { useRef } from 'react';
-import { ShoppingCart, Menu, Shell } from 'lucide-react';
+import { ShoppingCart, Shell } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
-export default function Header({ onOpenMenu, onOpenCart, onOpenDebug }) {
+export default function Header({ isMenuOpen, onToggleMenu, onOpenCart, onOpenDebug }) {
   const { totalItems } = useCart();
   const clickCount = useRef(0);
   const clickTimer = useRef(null);
@@ -43,13 +43,42 @@ export default function Header({ onOpenMenu, onOpenCart, onOpenDebug }) {
 
         {/* Right section */}
         <div className="flex items-center gap-3 sm:gap-5">
-          {/* Menu trigger — burger only */}
+          {/* Menu trigger — burger morphs into X when open */}
           <button
-            onClick={onOpenMenu}
-            className="flex items-center justify-center text-gray-800 hover:text-navy transition-colors p-1"
-            aria-label="Открыть меню"
+            data-menu-trigger
+            onClick={onToggleMenu}
+            className="relative flex items-center justify-center text-gray-800 hover:text-navy transition-colors p-1 w-7 h-7 sm:w-8 sm:h-8"
+            aria-label={isMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
+            aria-expanded={isMenuOpen}
           >
-            <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
+            <span className="relative block w-5 h-5 sm:w-6 sm:h-6">
+              <span
+                className="absolute left-0 right-0 top-1/2 h-[2px] bg-current rounded-full"
+                style={{
+                  transform: isMenuOpen
+                    ? 'translateY(-50%) rotate(45deg)'
+                    : 'translateY(calc(-50% - 6px)) rotate(0deg)',
+                  transition: 'transform 280ms cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
+              />
+              <span
+                className="absolute left-0 right-0 top-1/2 h-[2px] bg-current rounded-full"
+                style={{
+                  transform: 'translateY(-50%)',
+                  opacity: isMenuOpen ? 0 : 1,
+                  transition: 'opacity 180ms ease',
+                }}
+              />
+              <span
+                className="absolute left-0 right-0 top-1/2 h-[2px] bg-current rounded-full"
+                style={{
+                  transform: isMenuOpen
+                    ? 'translateY(-50%) rotate(-45deg)'
+                    : 'translateY(calc(-50% + 6px)) rotate(0deg)',
+                  transition: 'transform 280ms cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
+              />
+            </span>
           </button>
 
           {/* Cart — plain icon with badge */}

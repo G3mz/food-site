@@ -133,7 +133,8 @@ export default function App() {
       )}
 
       <Header
-        onOpenMenu={openMenu}
+        isMenuOpen={mobileMenuOpen}
+        onToggleMenu={() => setMobileMenuOpen(o => !o)}
         onOpenCart={openCart}
         onOpenDebug={() => setDebugOpen(true)}
       />

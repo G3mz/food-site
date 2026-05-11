@@ -1,8 +1,31 @@
-import { X, Phone } from 'lucide-react';
+import { Phone } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function MobileMenu({ isOpen, onClose, settings = {} }) {
   const phone = settings.phone || '+7 929 842 98 91';
   const phoneHref = 'tel:' + phone.replace(/[^0-9+]/g, '');
+
+  const [pos, setPos] = useState({ top: 64, right: 16 });
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const measure = () => {
+      const btn = document.querySelector('[data-menu-trigger]');
+      if (!btn) return;
+      const r = btn.getBoundingClientRect();
+      setPos({
+        top: r.bottom + 10,
+        right: Math.max(8, window.innerWidth - r.right),
+      });
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    window.addEventListener('scroll', measure, true);
+    return () => {
+      window.removeEventListener('resize', measure);
+      window.removeEventListener('scroll', measure, true);
+    };
+  }, [isOpen]);
 
   const handleNav = (sectionId) => {
     onClose();
@@ -28,33 +51,29 @@ export default function MobileMenu({ isOpen, onClose, settings = {} }) {
         }`}
       />
 
-      {/* Drawer */}
+      {/* Drawer — expands from menu icon (top-right) */}
       <aside
-        className={`fixed top-3 right-3 sm:top-4 sm:right-4 z-[3000] w-[280px] sm:w-[320px] rounded-3xl border border-white/40 overflow-hidden transition-all duration-300 ${
-          isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
+        className={`fixed z-[3000] w-[280px] sm:w-[320px] rounded-3xl border border-white/40 overflow-hidden ${
+          isOpen ? 'pointer-events-auto' : 'pointer-events-none'
         }`}
         style={{
+          top: pos.top,
+          right: pos.right,
           background: 'rgba(255, 255, 255, 0.75)',
           backdropFilter: 'blur(28px) saturate(180%)',
           WebkitBackdropFilter: 'blur(28px) saturate(180%)',
           boxShadow:
             '0 20px 60px rgba(23, 59, 115, 0.18), inset 0 1px 0 rgba(255,255,255,0.7)',
+          transformOrigin: 'top right',
+          transform: isOpen ? 'scale(1)' : 'scale(0.4)',
+          opacity: isOpen ? 1 : 0,
+          transition: isOpen
+            ? 'transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 200ms ease-out'
+            : 'transform 200ms cubic-bezier(0.4, 0, 1, 1), opacity 150ms ease-in',
         }}
       >
-        {/* Close */}
-        <div className="flex items-center justify-between px-5 pt-4 pb-2">
-          <span className="font-serif text-base font-bold text-navy">Меню</span>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-900 transition-colors p-1"
-            aria-label="Закрыть"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
         {/* Nav links — minimalist text rows */}
-        <nav className="px-2 pb-2">
+        <nav className="px-2 pt-3 pb-2">
           {navItems.map(item => (
             <button
               key={item.label}

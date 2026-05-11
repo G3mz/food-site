@@ -1,6 +1,8 @@
 # 🔥 Печь & Борщ — Домашняя кулинария
 
-Сайт доставки домашней еды ручной работы: пельмени, вареники, блинчики, супы, салаты. Динамический контент из PocketBase CMS, корзина и оформление заказов.
+Сайт доставки домашней еды ручной работы: пельмени, вареники, блинчики, супы, салаты. React SPA с динамическим контентом из PocketBase CMS, корзина и оформление заказов.
+
+**Репозиторий:** https://github.com/G3mz/food-site
 
 ---
 
@@ -11,12 +13,10 @@
 - [Структура проекта](#-структура-проекта)
 - [Быстрый старт](#-быстрый-старт)
 - [PocketBase — коллекции](#-pocketbase--коллекции)
-- [Админ-панель](#-админ-панель)
 - [Функционал сайта](#-функционал-сайта)
-- [Деплой на Netlify](#-деплой-на-netlify)
-- [Туннель для удалённого доступа](#-туннель-для-удалённого-доступа)
-- [Переезд на VPS](#-переезд-на-vps)
+- [Деплой](#-деплой)
 - [Конфигурация](#-конфигурация)
+- [Changelog](#-changelog)
 
 ---
 
@@ -24,12 +24,12 @@
 
 | Компонент | Технология |
 |-----------|-----------|
-| Фронтенд | HTML5, CSS3, Vanilla JS |
-| Шрифты | Google Fonts (Nunito, Caveat) |
+| Фреймворк | React 18 + Vite 6 |
+| Стили | Tailwind CSS 3 + PostCSS |
+| Иконки | Lucide React |
 | CMS / Бэкенд | [PocketBase](https://pocketbase.io/) (self-hosted) |
-| Хостинг фронтенда | [Netlify](https://netlify.com/) |
-| Туннель (временно) | Cloudflare Tunnel (`cloudflared`) |
-| Уведомления о заказах | Telegram через Google Apps Script webhook |
+| Хостинг | Netlify / Vercel / любой статический хостинг |
+| Уведомления о заказах | Telegram webhook |
 
 ---
 
@@ -37,8 +37,8 @@
 
 ```
 ┌──────────────┐     API      ┌──────────────────┐
-│   Netlify     │ ──────────► │   PocketBase     │
-│  (фронтенд)   │ ◄────────── │   (CMS + API)    │
+│   React SPA   │ ──────────► │   PocketBase     │
+│  (Vite build) │ ◄────────── │   (CMS + API)    │
 │  статика      │              │   localhost:8090  │
 └──────────────┘              └──────────────────┘
        │                              │
@@ -50,9 +50,9 @@
 └──────────────┘              └──────────────────┘
 ```
 
-- **Фронтенд** — статический HTML/JS/CSS на Netlify
+- **Фронтенд** — React SPA, билдится Vite в статику
 - **PocketBase** — headless CMS: товары, настройки, заказы
-- **Fallback** — если PocketBase недоступен, сайт показывает встроенные данные из JS
+- **Fallback** — если PocketBase недоступен, сайт показывает встроенные данные из `src/data/fallback.js`
 - **Заказы** — отправляются параллельно в PocketBase (если доступен) и в Telegram webhook
 
 ---
@@ -60,27 +60,44 @@
 ## 📁 Структура проекта
 
 ```
-site-main/
-├── index.html              # Главная страница (динамические контейнеры)
-├── css/
-│   └── style.css           # Все стили (адаптив, модалки, карточки)
-├── js/
-│   └── main.js             # Логика: API, рендер, корзина, заказы
-├── img/                    # Локальные изображения товаров
-│   ├── pelmenidom.jpeg
-│   ├── vareniki.png
-│   └── vareniki_vishnya.png
-├── pb_collections/         # JSON-схемы коллекций PocketBase
-│   ├── products.json
-│   ├── orders.json
-│   ├── site_settings.json
-│   ├── seed_products.json
-│   └── seed_settings.json
-├── seed.js                 # Скрипт импорта данных в PocketBase
-├── pocketbase/             # Исполняемый файл PocketBase + данные
-├── cloudflared.exe         # Cloudflare Tunnel
-├── netlify.toml            # Конфигурация Netlify
-├── .gitignore
+food-site/
+├── public/
+│   └── img/                    # Изображения (hero, товары)
+├── src/
+│   ├── main.jsx                # Точка входа React
+│   ├── App.jsx                 # Главный компонент (состояние, лейаут)
+│   ├── index.css               # Tailwind + глобальные стили
+│   ├── components/
+│   │   ├── Header.jsx          # Шапка: liquid-glass pill, бургер→X, корзина
+│   │   ├── Hero.jsx            # Hero-секция: фон, волны, заголовок
+│   │   ├── ProductGrid.jsx     # Каталог: табы + поиск + сетка
+│   │   ├── ProductCard.jsx     # Карточка товара: «от X ₽» → модалка
+│   │   ├── ProductModal.jsx    # Расширенная карточка: вес, цена, корзина
+│   │   ├── CategoryTabs.jsx    # Табы категорий (pill-стиль)
+│   │   ├── CartModal.jsx       # Корзина: товары, соусы, доставка, заказ
+│   │   ├── MobileMenu.jsx      # Дровер-меню: glass-стиль, из бургера
+│   │   ├── MobileBottomBar.jsx # Нижняя панель (мобильная)
+│   │   ├── Features.jsx        # Секция «О нас»
+│   │   ├── Footer.jsx          # Подвал
+│   │   ├── DebugPanel.jsx      # Скрытая панель (5 кликов по лого)
+│   │   ├── Toast.jsx           # Уведомления
+│   │   └── CustomOrderBanner.jsx
+│   ├── context/
+│   │   └── CartContext.jsx      # React Context: корзина, состояние
+│   ├── hooks/
+│   │   └── usePocketBase.js    # Хук: загрузка данных из PocketBase
+│   ├── data/
+│   │   ├── fallback.js         # Fallback-данные (товары, настройки, соусы)
+│   │   └── streets.js          # Список улиц Геленджика (автокомплит)
+│   └── utils/
+│       └── flyToCart.js        # Утилита (неактивна)
+├── pb_collections/             # JSON-схемы PocketBase
+├── index.html                  # HTML-шаблон Vite
+├── vite.config.js              # Конфиг Vite
+├── tailwind.config.js          # Конфиг Tailwind
+├── postcss.config.js           # Конфиг PostCSS
+├── netlify.toml                # Конфиг Netlify
+├── package.json
 └── README.md
 ```
 
@@ -88,7 +105,13 @@ site-main/
 
 ## 🚀 Быстрый старт
 
-### 1. Запустить PocketBase
+### 1. Установить зависимости
+
+```bash
+npm install
+```
+
+### 2. Запустить PocketBase
 
 ```bash
 # Windows
@@ -102,31 +125,21 @@ cd pocketbase
 
 PocketBase запустится на `http://127.0.0.1:8090`
 
-### 2. Создать супер-пользователя (первый запуск)
+### 3. Запустить dev-сервер
 
 ```bash
-# Windows
-.\pocketbase\pocketbase.exe superuser upsert admin@pech-borsh.ru admin123456
-
-# Linux / macOS
-./pocketbase/pocketbase superuser upsert admin@pech-borsh.ru admin123456
+npm run dev
 ```
 
-### 3. Создать коллекции
+Сайт откроется на `http://localhost:5173`
 
-Открой `http://127.0.0.1:8090/_/`, зайди в админку и создай 3 коллекции. Схемы описаны в `pb_collections/*.json`.
-
-### 4. Импортировать начальные данные
+### 4. Production-билд
 
 ```bash
-node seed.js
+npm run build
 ```
 
-Создаст 30 товаров и 13 настроек сайта.
-
-### 5. Открыть сайт
-
-Запусти Live Server (VS Code) или любой локальный сервер. Сайт подтянет данные из PocketBase автоматически.
+Результат в папке `dist/`.
 
 ---
 
@@ -138,7 +151,8 @@ node seed.js
 |------|-----|:---:|----------|
 | `name` | text | ✅ | Название товара |
 | `description` | text | ✅ | Краткое описание |
-| `price` | number | ✅ | Цена в рублях |
+| `price` | number | ✅ | Цена за 500 г (в рублях) |
+| `price_kg` | number | ❌ | Цена за 1 кг (если отличается от price×2) |
 | `image` | text | ❌ | URL или путь к картинке |
 | `category` | select | ✅ | Категория: `meat`, `soups`, `desserts` |
 | `is_hit` | bool | ❌ | Флаг «Хит продаж» |
@@ -191,182 +205,82 @@ node seed.js
 | `footer_tagline` | Слоган в футере |
 | `footer_copyright` | Копирайт в футере |
 
----
+### `categories` — Категории
 
-## 🔐 Админ-панель
-
-**URL:** `http://127.0.0.1:8090/_/` (локально) или через Cloudflare Tunnel
-
-**Логин:** `admin@pech-borsh.ru`
-**Пароль:** `admin123456`
-
-### Возможности
-
-- **Товары** — CRUD; цены, картинки, категории, флаг «Хит», состав, приготовление
-- **Настройки** — менять все тексты: промо-строка, hero, статистика, телефон, футер
-- **Заказы** — просмотр, смена статуса (new → processing → delivered)
-- **Файлы** — загрузка изображений через встроенный менеджер
-
-Изменения применяются на сайте после обновления страницы.
+| Поле | Тип | Обязательное | Описание |
+|------|-----|:---:|----------|
+| `key` | text | ✅ | Ключ категории (`meat`, `soups`, `desserts`) |
+| `label` | text | ✅ | Отображаемое название |
+| `sort_order` | number | ❌ | Порядок сортировки |
 
 ---
 
 ## 🎯 Функционал сайта
 
+### Шапка (Header)
+- Плавающая pill-капсула с liquid-glass эффектом (iOS 26 стиль)
+- Лого «Печь & Борщ» — 5 быстрых кликов открывают Debug Panel
+- Бургер-кнопка морфирует в крестик (X) при открытии меню
+- Иконка корзины с бейджем количества
+
+### Меню (MobileMenu)
+- Glass-стиль дровер, раскрывается из позиции бургера (scale-анимация)
+- Навигация: Каталог, О нас, Доставка и оплата, Контакты
+- Телефон для звонка
+- Закрытие: бургер-кнопка, клик по фону
+
+### Hero-секция
+- Фоновое изображение без оверлея
+- Зелёный бейдж + крупный serif-заголовок
+- Волнистый SVG-разделитель снизу (разный для mobile/desktop)
+
 ### Каталог товаров
-- Динамический рендеринг из PocketBase
-- Фильтрация по категориям: Мясное, Супы, Десерты
-- Поиск по названию
-- Карточки с картинкой, названием, описанием, ценой
+- Табы категорий + поиск в одной строке
+- Карточки: изображение, категория, название, описание, тег «Ручная лепка»
+- Кнопка «от {price} ₽» — клик открывает модалку
 
-### Модалка товара
-- Открывается по клику на карточку
-- Крупная картинка с отступами и скруглениями
-- Полное описание, состав, приготовление
-- Бейдж «Хит продаж»
-- Кнопка «В корзину» (компактная, справа внизу)
-- Закрытие: клик по оверлею, кнопка ×, Escape
+### Модалка товара (ProductModal)
+- Переключатель веса: **500 г / 1 кг** (цена пересчитывается)
+- Цена за 1 кг: поле `price_kg` из БД или `price × 2`
+- Плавающий крестик закрытия (sticky)
+- Sticky-блок «В корзину» внизу модалки
+- Состав, приготовление, рекомендации
 
-### Слайдер хитов продаж
-- Автопрокрутка
-- Навигация стрелками и точками
-- Свайп на мобильных
+### Корзина (CartModal)
+- Список товаров с количеством
+- Выбор соусов (сметана, чесночный, аджика — по 50 ₽)
+- Подитог + стоимость доставки
+- Форма доставки: автокомплит улиц Геленджика, квартира, домофон
+- Карта Yandex Maps для геокодирования адреса
+- Маска телефона, валидация, выбор оплаты
 
-### Корзина
-- Добавление / изменение количества / удаление
-- Выбор соусов (+50 ₽ каждый)
-- Итого с учётом соусов
-
-### Оформление заказа
-- Адрес доставки, способ оплаты, количество персон
-- Маска ввода телефона, валидация
-- Отправка в **PocketBase** + **Telegram** параллельно
-
-### Адаптивность
-- Мобильная навигация (нижняя панель)
-- Бургер-меню
-- Адаптивные карточки и модалки
-- PWA-ready (meta-теги)
+### Debug Panel
+- Скрытая панель (5 кликов по лого)
+- Статус PocketBase, тест API, просмотр данных
 
 ---
 
-## 🚢 Деплой на Netlify
+## 🚢 Деплой
 
-### Через CLI
-
-```bash
-# Установить и авторизоваться
-npm install -g netlify-cli
-netlify login
-
-# Создать deploy-папку (без PocketBase файлов)
-mkdir deploy_tmp
-cp index.html netlify.toml .gitignore deploy_tmp/
-cp -r css js img deploy_tmp/
-
-# Задеплоить
-netlify deploy --dir deploy_tmp --prod
-
-# Удалить временную папку
-rm -rf deploy_tmp
-```
-
-### Через GitHub
-
-1. Загрузить проект в GitHub (без `pocketbase/`, `cloudflared.exe`, `pb_collections/`)
-2. Подключить репозиторий в Netlify
-3. Настроить: publish directory = `.`
-
----
-
-## 🌐 Туннель для удалённого доступа
-
-Для доступа к PocketBase с других устройств (пока нет VPS):
+### Netlify
 
 ```bash
-# Скачать cloudflared (Windows)
-Invoke-WebRequest -Uri "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe" -OutFile "cloudflared.exe"
-
-# Запустить туннель
-.\cloudflared.exe tunnel --url http://127.0.0.1:8090
+npm run build
+npx netlify-cli deploy --prod --dir=dist
 ```
 
-Публичный URL вида `https://xxx-yyy-zzz.trycloudflare.com`
-
-**После получения URL:**
-1. Обновить `PB_URL` в `js/main.js`
-2. Передеплоить на Netlify
-
-**⚠️ Ограничения:**
-- URL меняется при каждом перезапуске
-- Туннель работает пока запущен `cloudflared`
-- Не подходит для production
-
----
-
-## 🖥 Переезд на VPS
-
-Для стабильной работы перенесите PocketBase на VPS:
-
-### 1. Установить PocketBase на сервер
+### Vercel
 
 ```bash
-wget https://github.com/pocketbase/pocketbase/releases/latest/download/pocketbase_0.23.4_linux_amd64.zip
-unzip pocketbase_0.23.4_linux_amd64.zip
-chmod +x pocketbase
-./pocketbase serve --http=0.0.0.0:8090
+npx vercel --prod
 ```
 
-### 2. Настроить автозапуск (systemd)
-
-```ini
-# /etc/systemd/system/pocketbase.service
-[Unit]
-Description=PocketBase
-After=network.target
-
-[Service]
-Type=simple
-WorkingDirectory=/opt/pocketbase
-ExecStart=/opt/pocketbase/pocketbase serve --http=0.0.0.0:8090
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-```
+### Любой статический хостинг
 
 ```bash
-sudo systemctl enable pocketbase
-sudo systemctl start pocketbase
+npm run build
+# Загрузить содержимое dist/ на хостинг
 ```
-
-### 3. Настроить Nginx (reverse proxy + HTTPS)
-
-```nginx
-server {
-    listen 80;
-    server_name pb.yourdomain.ru;
-
-    location / {
-        proxy_pass http://127.0.0.1:8090;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
-```
-
-```bash
-sudo certbot --nginx -d pb.yourdomain.ru
-```
-
-### 4. Обновить PB_URL
-
-В `js/main.js` заменить:
-```js
-const PB_URL = 'https://pb.yourdomain.ru';
-```
-
-Передеплоить на Netlify. Туннель больше не нужен.
 
 ---
 
@@ -374,23 +288,75 @@ const PB_URL = 'https://pb.yourdomain.ru';
 
 ### PB_URL
 
-Адрес PocketBase. Определяется в `js/main.js`:
+Адрес PocketBase. Определяется в `src/hooks/usePocketBase.js`:
 
 ```js
 const PB_URL = window.__PB_URL__ || 'https://pb.yourdomain.ru';
 ```
 
-Можно задать через глобальную переменную `window.__PB_URL__` до загрузки скрипта.
+Можно задать через глобальную переменную `window.__PB_URL__` до загрузки приложения.
 
 ### Fallback-данные
 
-Если PocketBase недоступен (таймаут 3 сек), сайт переключается на встроенные данные:
-- `FALLBACK_SETTINGS` — настройки сайта (13 ключей)
-- `FALLBACK_PRODUCTS` — 30 товаров с составом и приготовлением
+Если PocketBase недоступен (таймаут 3 сек), сайт переключается на встроенные данные из `src/data/fallback.js`:
+- `FALLBACK_SETTINGS` — настройки сайта
+- `FALLBACK_PRODUCTS` — товары с составом и приготовлением
+- `SAUCES` — доступные соусы
+
+### Автокомплит улиц
+
+Список улиц Геленджика в `src/data/streets.js`. Используется в CartModal для поля «Улица».
 
 ### Telegram Webhook
 
-URL для уведомлений о заказах задан в функции `sendToTelegram()` в `main.js`. Замените на свой при необходимости.
+URL для уведомлений о заказах задан в CartModal. Замените на свой при необходимости.
+
+---
+
+## Changelog
+
+### v2.0 — Редизайн (май 2025)
+
+**Полный переход на React + Vite + Tailwind CSS**
+
+- Переписан фронтенд с vanilla JS на React 18 SPA
+- Сборка через Vite 6 вместо статического HTML
+- Стили через Tailwind CSS вместо отдельного CSS-файла
+
+**Редизайн Header**
+- Плавающая pill-капсула с liquid-glass эффектом (backdrop-blur + saturate)
+- Убраны навигационные ссылки и телефон из шапки
+- Бургер-кнопка морфирует в X при открытии меню (3 полоски → крестик)
+- Иконка корзины без круга, только бейдж
+
+**Редизайн Hero**
+- Текст прямо на фоне (без белого overlay)
+- Зелёный бейдж + крупный serif-заголовок с курсивным последним словом
+- Волнистый SVG-разделитель (разный для mobile/desktop)
+- Убрана бегущая строка промо
+
+**Редизайн мобильного меню**
+- Компактный glass-дровер из правого верхнего угла
+- Scale-анимация из позиции бургера
+- Минималистичные текстовые ссылки + телефон
+
+**Карточки товаров**
+- Убрана граммовка и тег «Натуральный состав»
+- Оставлен тег «Ручная лепка»
+- Кнопка «от {price} ₽» вместо корзины — открывает модалку
+
+**Модалка товара**
+- Переключатель веса 500 г / 1 кг с динамической ценой
+- Плавающий крестик закрытия (sticky)
+- Sticky-блок «В корзину» внизу
+- Разные позиции в корзине для разных весов
+
+**Корзина**
+- Автокомплит улиц Геленджика (локальный список)
+- Интеграция Yandex Maps для геокодирования
+
+**Скрытая Debug Panel**
+- 5 кликов по лого → панель с диагностикой PocketBase
 
 ---
 

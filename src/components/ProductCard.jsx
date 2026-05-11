@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { ShoppingCart, Leaf, Hand, UtensilsCrossed, Plus, Minus, Trash2 } from 'lucide-react';
-import { useCart } from '../context/CartContext';
+import { Hand, UtensilsCrossed } from 'lucide-react';
 
 const CATEGORY_COLORS = {
   meat: '#E8D5D0',
@@ -9,8 +8,6 @@ const CATEGORY_COLORS = {
 };
 
 export default function ProductCard({ product, onClick, categoryLabels = {} }) {
-  const { addToCart, items, changeQty } = useCart();
-  const qty = items[product.name]?.qty || 0;
   const [imgLoaded, setImgLoaded] = useState(false);
   const [isClamped, setIsClamped] = useState(false);
   const descRef = useRef(null);
@@ -24,9 +21,6 @@ export default function ProductCard({ product, onClick, categoryLabels = {} }) {
     const el = descRef.current;
     if (el) setIsClamped(el.scrollHeight > el.clientHeight);
   }, [product.description]);
-
-  const weightMatch = product.description?.match(/(\d+\s*(г|мл|литр)[.]*)/i);
-  const weight = weightMatch ? weightMatch[1].replace('.', '') : null;
 
   return (
     <div
@@ -95,53 +89,22 @@ export default function ProductCard({ product, onClick, categoryLabels = {} }) {
         {/* Feature tags */}
         <div className="flex flex-wrap gap-2 mb-2 sm:mb-4">
           <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-gray-400">
-            <Leaf className="w-3 h-3" />
-            Натуральный состав
-          </span>
-          <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-gray-400">
             <Hand className="w-3 h-3" />
             Ручная лепка
           </span>
         </div>
 
         {/* Price row */}
-        <div className="flex items-center justify-between sm:pt-3 sm:border-t sm:border-gray-100">
-          <div className="flex items-center gap-2 sm:gap-3">
-            {weight && (
-              <span className="text-[10px] sm:text-xs text-gray-400 font-medium">{weight}</span>
-            )}
-            <span className="text-base sm:text-lg font-bold text-gray-900">
-              {product.price} <span className="text-xs sm:text-sm font-semibold text-gray-500">₽</span>
-            </span>
-          </div>
-          {qty === 0 ? (
-            <button
-              onClick={e => {
-                e.stopPropagation();
-                addToCart(product.name, product.price);
-              }}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-navy text-white flex items-center justify-center hover:bg-navy-light transition-colors active:scale-95"
-              aria-label={`Добавить ${product.name} в корзину`}
-            >
-              <ShoppingCart className="w-4 h-4" />
-            </button>
-          ) : (
-            <div className="flex items-center gap-1.5 bg-gray-50 rounded-xl px-1 py-1" onClick={e => e.stopPropagation()}>
-              <button
-                onClick={() => changeQty(product.name, -1)}
-                className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:border-navy hover:text-navy transition-colors"
-              >
-                {qty === 1 ? <Trash2 className="w-3.5 h-3.5" /> : <Minus className="w-3.5 h-3.5" />}
-              </button>
-              <span className="text-sm font-bold text-gray-900 min-w-[20px] text-center">{qty}</span>
-              <button
-                onClick={() => addToCart(product.name, product.price)}
-                className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-navy text-white flex items-center justify-center hover:bg-navy-light transition-colors"
-              >
-                <Plus className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
+        <div className="flex items-center justify-end sm:pt-3 sm:border-t sm:border-gray-100">
+          <button
+            onClick={e => { e.stopPropagation(); onClick?.(); }}
+            className="flex items-baseline gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-navy text-white hover:bg-navy-light transition-colors active:scale-95"
+            aria-label={`Открыть ${product.name}`}
+          >
+            <span className="text-[11px] sm:text-xs font-medium opacity-70">от</span>
+            <span className="text-sm sm:text-base font-bold">{product.price}</span>
+            <span className="text-xs sm:text-sm font-semibold opacity-80">₽</span>
+          </button>
         </div>
       </div>
     </div>
