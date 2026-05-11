@@ -1,0 +1,14 @@
+{
+  "name": "orders",
+  "type": "base",
+  "fields": [
+    {"name": "items", "type": "text", "required": true},
+    {"name": "address", "type": "text", "required": true},
+    {"name": "phone", "type": "text", "required": true},
+    {"name": "payment", "type": "text", "required": false},
+    {"name": "persons", "type": "number", "required": false},
+    {"name": "sauces", "type": "text", "required": false},
+    {"name": "total", "type": "number", "required": true},
+    {"name": "status", "type": "select", "required": false, "options": {"values": ["new", "processing", "delivered", "cancelled"], "maxSelect": 1}}
+  ]
+}

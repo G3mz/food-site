@@ -1,0 +1,8 @@
+{
+  "name": "site_settings",
+  "type": "base",
+  "fields": [
+    {"name": "key", "type": "text", "required": true},
+    {"name": "value", "type": "text", "required": true}
+  ]
+}
