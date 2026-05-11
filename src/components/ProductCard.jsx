@@ -83,27 +83,19 @@ export default function ProductCard({ product, onClick, categoryLabels = {} }) {
           </button>
         )}
 
-        {/* Spacer to push tags + price to bottom */}
-        <div className="flex-1" />
-
-        {/* Feature tags */}
-        <div className="flex flex-wrap gap-2 mb-2 sm:mb-4">
-          <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-gray-400">
-            <Hand className="w-3 h-3" />
-            Ручная лепка
-          </span>
-        </div>
+        {/* Spacer to push price to bottom */}
+        <div className="flex-1 mb-2 sm:mb-4" />
 
         {/* Price row */}
         <div className="flex items-center justify-end sm:pt-3 sm:border-t sm:border-gray-100">
           <button
             onClick={e => { e.stopPropagation(); onClick?.(); }}
-            className="flex items-baseline gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-navy text-white hover:bg-navy-light transition-colors active:scale-95"
+            className="flex items-baseline gap-1 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-navy text-white hover:bg-navy-light transition-colors active:scale-95 mr-1"
             aria-label={`Открыть ${product.name}`}
           >
-            <span className="text-[11px] sm:text-xs font-medium opacity-70">от</span>
-            <span className="text-sm sm:text-base font-bold">{product.price}</span>
-            <span className="text-xs sm:text-sm font-semibold opacity-80">₽</span>
+            <span className="text-[10px] sm:text-[11px] font-medium opacity-70">от</span>
+            <span className="text-xs sm:text-sm font-bold">{product.price}</span>
+            <span className="text-[10px] sm:text-xs font-semibold opacity-80">₽</span>
           </button>
         </div>
       </div>

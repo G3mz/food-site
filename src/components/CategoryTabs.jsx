@@ -37,7 +37,7 @@ export default function CategoryTabs({ active, onChange, categories = FALLBACK_C
       {/* Sliding pill */}
       <div
         ref={pillRef}
-        className="absolute top-0 bottom-0 rounded-full bg-[#173B73]"
+        className="absolute top-0 bottom-0 rounded-full bg-white shadow-sm"
         style={{
           left: pillStyle.left,
           width: pillStyle.width,
@@ -58,7 +58,7 @@ export default function CategoryTabs({ active, onChange, categories = FALLBACK_C
               relative z-10 whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-medium
               transition-colors duration-300 select-none
               ${isActive
-                ? 'text-white'
+                ? 'text-navy'
                 : 'text-gray-600 hover:text-navy'
               }
             `}

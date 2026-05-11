@@ -24,8 +24,8 @@ export default function Header({ isMenuOpen, onToggleMenu, onOpenCart, onOpenDeb
         className="max-w-[1280px] mx-auto rounded-full px-6 py-3 sm:py-3.5 flex items-center justify-between border border-white/40"
         style={{
           background: 'rgba(255, 255, 255, 0.55)',
-          backdropFilter: 'blur(24px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+          backdropFilter: 'blur(26px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(26px) saturate(180%)',
           boxShadow:
             '0 8px 32px rgba(23, 59, 115, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 -1px 0 rgba(255, 255, 255, 0.15)',
         }}
@@ -90,7 +90,7 @@ export default function Header({ isMenuOpen, onToggleMenu, onOpenCart, onOpenDeb
           >
             <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6" />
             {totalItems > 0 && (
-              <span className="absolute -top-1 -right-2 bg-navy text-white text-[10px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1">
+              <span className="absolute -top-1.5 -right-2.5 bg-navy text-white text-[10px] font-bold min-w-[18px] h-[18px] rounded-full grid place-items-center leading-none">
                 {totalItems}
               </span>
             )}

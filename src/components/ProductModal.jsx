@@ -240,9 +240,6 @@ export default function ProductModal({ product, onClose, products = [] }) {
                           <UtensilsCrossed className="w-6 h-6 text-gray-300" />
                         </div>
                       )}
-                      <div className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center">
-                        <Heart className="w-3.5 h-3.5 text-gray-400" />
-                      </div>
                     </div>
                     <div className="p-2">
                       <p className="text-xs font-semibold text-gray-900 line-clamp-2 leading-tight">{rec.name}</p>

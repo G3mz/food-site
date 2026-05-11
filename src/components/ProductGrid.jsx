@@ -48,7 +48,7 @@ export default function ProductGrid({ products, onProductClick, categories }) {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Найти блюдо..."
-              className="w-full pl-11 pr-10 py-2.5 bg-gray-50 border border-transparent rounded-full text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:bg-white focus:border-navy focus:ring-2 focus:ring-navy/10 transition-all"
+              className="w-full pl-11 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-full text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:bg-white focus:border-navy focus:ring-2 focus:ring-navy/10 transition-all"
             />
             {search && (
               <button
