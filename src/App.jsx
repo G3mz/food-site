@@ -10,7 +10,6 @@ import CartModal from './components/CartModal';
 import CustomOrderBanner from './components/CustomOrderBanner';
 import Features from './components/Features';
 import Footer from './components/Footer';
-import MobileBottomBar from './components/MobileBottomBar';
 import MobileMenu from './components/MobileMenu';
 import Toast from './components/Toast';
 import DebugPanel from './components/DebugPanel';
@@ -153,8 +152,6 @@ export default function App() {
       <Footer settings={settings} />
 
       <DebugPanel isOpen={debugOpen} onClose={() => setDebugOpen(false)} />
-
-      <MobileBottomBar onOpenCart={openCart} />
 
       <MobileMenu
         isOpen={mobileMenuOpen}
