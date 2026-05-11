@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { X, ShoppingCart, UtensilsCrossed, Plus, Minus, Trash2, Clock, Users, Flame, Weight, Heart, Leaf, ChefHat } from 'lucide-react';
+import { X, ShoppingCart, UtensilsCrossed, Plus, Minus, Trash2, Clock, Utensils, Flame, Weight, Leaf, ChefHat } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 const WEIGHT_OPTIONS = [
@@ -37,9 +37,12 @@ export default function ProductModal({ product, onClose, products = [] }) {
 
   const hasImage = !!product.image;
 
-  // Parse weight from description
-  const weightMatch = product.description?.match(/(\d+)\s*(г|мл)/i);
-  const weightVal = weightMatch ? weightMatch[0] : null;
+  // Info cards — default values if PocketBase fields are empty
+  const cookTime = product.cook_time || '30 мин';
+  const basePortions = Number(product.portions) || 2;
+  const portions = weight === '500' ? basePortions : basePortions * 2;
+  const calories = product.calories || 320;
+  const weightLabel = weight === '500' ? '500 г' : '1 кг';
 
   return (
     <div
@@ -95,36 +98,36 @@ export default function ProductModal({ product, onClose, products = [] }) {
             {product.description}
           </p>
 
-          {/* Info badges */}
-          <div className="flex items-stretch gap-2 mb-6 overflow-x-auto scrollbar-hide">
-            {product.cook_time && (
-              <div className="flex-1 min-w-[70px] flex flex-col items-center justify-center gap-1 bg-gray-50 rounded-xl py-3 px-2">
-                <Clock className="w-4 h-4 text-gray-400" />
-                <span className="text-xs font-bold text-gray-900">{product.cook_time}</span>
+          {/* Info badges — always show 4 cards */}
+          <div className="flex items-stretch gap-2 mb-6">
+            <div className="flex-1 min-w-0 flex flex-row items-center justify-center gap-2 bg-gray-50 rounded-2xl py-3 px-2">
+              <Clock className="w-5 h-5 text-gray-400 flex-shrink-0" strokeWidth={1.75} />
+              <div className="flex flex-col leading-tight">
+                <span className="text-[13px] font-bold text-gray-900">{cookTime}</span>
                 <span className="text-[10px] text-gray-400">время</span>
               </div>
-            )}
-            {product.portions && (
-              <div className="flex-1 min-w-[70px] flex flex-col items-center justify-center gap-1 bg-gray-50 rounded-xl py-3 px-2">
-                <Users className="w-4 h-4 text-gray-400" />
-                <span className="text-xs font-bold text-gray-900">{product.portions}</span>
+            </div>
+            <div className="flex-1 min-w-0 flex flex-row items-center justify-center gap-2 bg-gray-50 rounded-2xl py-3 px-2">
+              <Utensils className="w-5 h-5 text-gray-400 flex-shrink-0" strokeWidth={1.75} />
+              <div className="flex flex-col leading-tight">
+                <span className="text-[13px] font-bold text-gray-900">{portions} порц.</span>
                 <span className="text-[10px] text-gray-400">порции</span>
               </div>
-            )}
-            {product.calories && (
-              <div className="flex-1 min-w-[70px] flex flex-col items-center justify-center gap-1 bg-gray-50 rounded-xl py-3 px-2">
-                <Flame className="w-4 h-4 text-gray-400" />
-                <span className="text-xs font-bold text-gray-900">{product.calories}</span>
+            </div>
+            <div className="flex-1 min-w-0 flex flex-row items-center justify-center gap-2 bg-gray-50 rounded-2xl py-3 px-2">
+              <Flame className="w-5 h-5 text-gray-400 flex-shrink-0" strokeWidth={1.75} />
+              <div className="flex flex-col leading-tight">
+                <span className="text-[13px] font-bold text-gray-900">{calories} ккал</span>
                 <span className="text-[10px] text-gray-400">на порцию</span>
               </div>
-            )}
-            {weightVal && (
-              <div className="flex-1 min-w-[70px] flex flex-col items-center justify-center gap-1 bg-gray-50 rounded-xl py-3 px-2">
-                <Weight className="w-4 h-4 text-gray-400" />
-                <span className="text-xs font-bold text-gray-900">{weightVal}</span>
+            </div>
+            <div className="flex-1 min-w-0 flex flex-row items-center justify-center gap-2 bg-gray-50 rounded-2xl py-3 px-2">
+              <Weight className="w-5 h-5 text-gray-400 flex-shrink-0" strokeWidth={1.75} />
+              <div className="flex flex-col leading-tight">
+                <span className="text-[13px] font-bold text-gray-900">{weightLabel}</span>
                 <span className="text-[10px] text-gray-400">вес</span>
               </div>
-            )}
+            </div>
           </div>
 
           {/* Composition */}

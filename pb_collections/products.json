@@ -5,9 +5,15 @@
     {"name": "name", "type": "text", "required": true},
     {"name": "description", "type": "text", "required": true},
     {"name": "price", "type": "number", "required": true},
+    {"name": "price_kg", "type": "number", "required": false},
     {"name": "image", "type": "url", "required": false},
     {"name": "category", "type": "select", "required": false, "options": {"values": ["meat", "soups", "desserts", "all"], "maxSelect": 1}},
     {"name": "is_hit", "type": "bool", "required": false},
-    {"name": "sort_order", "type": "number", "required": false}
+    {"name": "sort_order", "type": "number", "required": false},
+    {"name": "composition", "type": "text", "required": false},
+    {"name": "preparation", "type": "text", "required": false},
+    {"name": "cook_time", "type": "text", "required": false},
+    {"name": "portions", "type": "number", "required": false},
+    {"name": "calories", "type": "number", "required": false}
   ]
 }
